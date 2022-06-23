@@ -1,53 +1,44 @@
 package web.DAO;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import web.model.User;
-
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
-@Component
+@Repository
 public class UserDaoImp implements UserDao {
-    private static int USER_ID;
-    private List<User> userList = new ArrayList<>();
 
-    public UserDaoImp() {
-        userList.add(new User(++USER_ID, "User1", 10,"User1@mail.ru"));
-        userList.add(new User(++USER_ID, "User2", 20, "User2@mail.ru"));
-        userList.add(new User(++USER_ID, "User3", 30, "User3@mail.ru"));
-        userList.add(new User(++USER_ID, "User4", 40, "User4@mail.ru"));
-        userList.add(new User(++USER_ID, "User5", 50,  "User5@mail.ru"));
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
+    @Transactional
     @Override
     public List<User> getUser() {
-        return userList.stream().toList();
+        return entityManager.createQuery("select u from User u", User.class).getResultList();
     }
 
     @Override
     public User getUserById(int id) {
-        return userList.stream().filter(userList -> userList.getId() == id).findAny().orElse(null);
+        return entityManager.find(User.class, id);
     }
 
+    @Transactional
     @Override
     public void saveUser(User user) {
-        user.setId(++USER_ID);
-        userList.add(user);
+        entityManager.persist(user);
     }
 
+    @Transactional
     @Override
-    public void updateUser(int id, User updatedUser) {
-        User userToBeUpdated = getUserById(id);
-        userToBeUpdated.setName(updatedUser.getName());
-        userToBeUpdated.setAge(updatedUser.getAge());
-        userToBeUpdated.setEmail(updatedUser.getEmail());
-
-
-
+    public void updateUser(User user) {
+        entityManager.merge(user);
     }
 
+    @Transactional
     @Override
     public void deleteUser(int id) {
-        userList.removeIf(p -> p.getId() == id);
+        entityManager.remove(getUserById(id));
     }
 }

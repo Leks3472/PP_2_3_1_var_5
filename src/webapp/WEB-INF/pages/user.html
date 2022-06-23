@@ -6,16 +6,15 @@
 </head>
 <body>
 
-<div
-    th:each="userList : ${userList}">
-    <a th:href="@{/users/{id}(id=${userList.getId()})}"
-       th:text="${userList.getName() + ', ' + userList.getAge()}">user</a>
+<hr>
+<h3 >
+    <p><a th:href="@{users/new}" >New user </a></p>
+</h3>
+<hr>
+
+<div th:each="user : ${userList}">
+    <a th:href="@{users/{id}(id=${user.getId()})}" th:text="${user.getName()}">user</a>
 </div>
-
-<br/>
-<hr/>
-
-<a href="/users/new">Create new user</a>
 
 </body>
 </html>
